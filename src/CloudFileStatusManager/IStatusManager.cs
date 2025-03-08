@@ -11,9 +11,9 @@ namespace CloudFileStatusManager
         /// </para>
         /// <seealso cref="FileHydrationStatus"/>
         /// </summary>
-        FileHydrationStatus GetHydrationStatus();
+        FileHydrationStatus GetHydrationStatus(string filePath);
 
-        FilePinStatus GetPinStatus();
+        FilePinStatus GetPinStatus(string filePath);
 
         /// <summary>
         /// <para>
