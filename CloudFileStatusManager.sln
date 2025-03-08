@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFileStatusManager", "CloudFileStatusManager\CloudFileStatusManager.csproj", "{D2CDB198-C252-4411-BA08-3CD460A4BAF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFileStatusManager.CLI", "CloudFileStatusManager.CLI\CloudFileStatusManager.CLI.csproj", "{35AFFB80-0902-4950-82F4-157900094064}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2CDB198-C252-4411-BA08-3CD460A4BAF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2CDB198-C252-4411-BA08-3CD460A4BAF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2CDB198-C252-4411-BA08-3CD460A4BAF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2CDB198-C252-4411-BA08-3CD460A4BAF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35AFFB80-0902-4950-82F4-157900094064}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35AFFB80-0902-4950-82F4-157900094064}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35AFFB80-0902-4950-82F4-157900094064}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35AFFB80-0902-4950-82F4-157900094064}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB8D6D66-B39A-4BA9-8991-A891C1E4EA0C}
+	EndGlobalSection
+EndGlobal
