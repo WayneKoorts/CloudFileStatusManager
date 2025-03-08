@@ -1,4 +1,4 @@
-﻿namespace CloudFileStatusManager;
+﻿namespace CloudFileStatusManager.Enums;
 
 public enum FilePinStatus
 {

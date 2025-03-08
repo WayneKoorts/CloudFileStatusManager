@@ -1,4 +1,6 @@
-﻿namespace CloudFileStatusManager
+﻿using CloudFileStatusManager.Enums;
+
+namespace CloudFileStatusManager
 {
     public interface IStatusManager
     {
