@@ -11,9 +11,11 @@ namespace CloudFileStatusManager
         /// </para>
         /// <seealso cref="FileHydrationStatus"/>
         /// </summary>
-        FileHydrationStatus GetHydrationStatus(string filePath);
+        /// <param name="filePath"></param>
+        /// <param name="verbose">Enable verbose output.</param>
+        FileHydrationStatus GetHydrationStatus(string filePath, bool verbose = false);
 
-        FilePinStatus GetPinStatus(string filePath);
+        FilePinStatus GetPinStatus(string filePath, bool verbose = false);
 
         /// <summary>
         /// <para>
@@ -24,7 +26,8 @@ namespace CloudFileStatusManager
         /// <seealso cref="FileHydrationStatus"/>
         /// </summary>
         /// <param name="filePath"></param>
-        void HydrateFile(string filePath);
+        /// <param name="verbose">Enable verbose output.</param>
+        void HydrateFile(string filePath, bool verbose = false);
 
         /// <summary>
         /// <para>
@@ -41,6 +44,7 @@ namespace CloudFileStatusManager
         /// <seealso cref="FileHydrationStatus"/>
         /// </summary>
         /// <param name="filePath"></param>
-        void DehydrateFile(string filePath);
+        /// <param name="verbose">Enable verbose output.</param>
+        void DehydrateFile(string filePath, bool verbose = false);
     }
 }
