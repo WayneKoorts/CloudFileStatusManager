@@ -2,7 +2,7 @@
 
 ## Description
 
-The com.wkoorts.CloudFileStatusManager package provides a means to read & manage the status of files on cloud drives like iCloud Drive or OneDrive.
+This is a .NET library and CLI utility for reading & managing the hydration and pin status of files on cloud drives like iCloud Drive or OneDrive.
 
 ## Features
 
