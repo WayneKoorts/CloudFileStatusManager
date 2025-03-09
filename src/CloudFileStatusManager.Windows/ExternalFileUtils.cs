@@ -97,20 +97,22 @@ public static class ExternalFileUtils
     }
 
     /// <summary>
+    /// <para>
     /// Sets the specified attributes on the file at the specified path.
+    /// </para>
+    /// <para>
+    /// Supported attributes:
+    /// </para>
+    /// <seealso cref="FILE_ATTRIBUTE_PINNED" /><br/>
+    /// <seealso cref="FILE_ATTRIBUTE_UNPINNED" /><br/>
+    /// <seealso cref="FILE_ATTRIBUTE_OFFLINE" /><br/>
+    /// <seealso cref="FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS" />
     /// </summary>
     /// <param name="filePath"></param>
     /// <param name="setAttributes">List of attributes to set.</param>
     /// <param name="unsetAttributes">List of attributes to unset.</param>
     /// <exception cref="FileNotFoundException"></exception>
-    /// <exception cref="IOException">
-    /// Thrown if there is a problem updating the attributes
-    /// on the file.
-    /// </exception>
-    /// <seealso cref="FILE_ATTRIBUTE_PINNED" />
-    /// <seealso cref="FILE_ATTRIBUTE_UNPINNED" />
-    /// <seealso cref="FILE_ATTRIBUTE_OFFLINE" />
-    /// <seealso cref="FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS" />
+    /// <exception cref="IOException"></exception>
     internal static void SetAttributes(
         string filePath,
         uint[]? setAttributes = null,
