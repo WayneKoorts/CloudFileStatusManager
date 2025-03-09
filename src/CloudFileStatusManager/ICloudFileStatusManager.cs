@@ -2,7 +2,7 @@
 
 namespace CloudFileStatusManager
 {
-    public interface IStatusManager
+    public interface ICloudFileStatusManager
     {
         /// <summary>
         /// <para>
