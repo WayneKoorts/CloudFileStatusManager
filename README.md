@@ -26,6 +26,30 @@ This is a .NET library and CLI utility for reading & managing the hydration and 
   - This is a command-line interface for `CloudFileStatusManager.Windows`.
   - Produces no package.
 
+## Using the CLI
+
+Binaries for the CLI are available to download from the [Releases page](https://github.com/WayneKoorts/CloudFileStatusManager/releases).
+
+```shell
+$ ./cfsm.exe --help
+Description:
+  Cloud File Status Manager CLI for Windows
+
+Usage:
+  cfsm [command] [options]
+
+Options:
+  --verbose       Show verbose output
+  --version       Show version information
+  -?, -h, --help  Show help and usage information
+
+Commands:
+  get-hydration-status <file>  Get the hydration status of a file
+  get-pin-status <file>        Get the pin status of a file
+  hydrate <file>               Hydrate a file
+  dehydrate <file>             Dehydrate a file
+```
+
 ## Acknowledgements
 
 Thank you to [Hunter Ratliff](https://hratliff.com/), who explained how file attributes in Windows represent the various states of files on cloud drives in [this blog post](https://hratliff.com/posts/icloud-onedrive-syncing-in-cmd/).
