@@ -1,8 +1,8 @@
 ﻿using CloudFileStatusManager.Enums;
 
-namespace CloudFileStatusManager.Implementations.Windows;
+namespace CloudFileStatusManager.Windows;
 
-public class WindowsStatusManager : IStatusManager
+public class WindowsCloudFileStatusManager : ICloudFileStatusManager
 {
     public FileHydrationStatus GetHydrationStatus(string filePath)
     {
@@ -53,10 +53,11 @@ public class WindowsStatusManager : IStatusManager
         {
             return FilePinStatus.Pinned;
         }
-        else if ((attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0)
+        if ((attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0)
         {
             return FilePinStatus.Unpinned;
         }
+
         return FilePinStatus.Unpinned;
     }
 

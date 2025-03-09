@@ -1,7 +1,8 @@
 ﻿using System.Runtime.InteropServices;
+
 // ReSharper disable InconsistentNaming
 
-namespace CloudFileStatusManager.Implementations.Windows;
+namespace CloudFileStatusManager.Windows;
 
 public static class ExternalFileUtils
 {
