@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>$(AssemblyName)</PackageId>
+    <AssemblyName>cfsm</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
