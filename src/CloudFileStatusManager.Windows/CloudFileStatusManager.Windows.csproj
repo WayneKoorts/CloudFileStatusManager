@@ -8,7 +8,6 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>com.wkoorts.$(AssemblyName)</PackageId>
     <Title>Cloud File Status Manager for Windows</Title>
-    <Version>$(AssemblyVersion)</Version>
     <Authors>Wayne Koorts</Authors>
     <Description>A C# library for managing the hydration status of files on cloud drives like iCloud Drive or OneDrive.  This package contains the Windows implementation of ICloudFileStatusManager.</Description>
     <Copyright>Copyright (c) Wayne Koorts 2025</Copyright>
@@ -17,6 +16,7 @@
     <RepositoryUrl>https://github.com/WayneKoorts/CloudFileStatusManager</RepositoryUrl>
     <AssemblyVersion>1.1.1.0</AssemblyVersion>
     <FileVersion>1.1.1.0</FileVersion>
+    <Version>$(AssemblyVersion)</Version>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
