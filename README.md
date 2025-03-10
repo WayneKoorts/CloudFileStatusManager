@@ -39,11 +39,12 @@ Usage:
   cfsm [command] [options]
 
 Options:
-  --verbose       Show verbose output
+  -v, --verbose   Show verbose output
   --version       Show version information
   -?, -h, --help  Show help and usage information
 
 Commands:
+  is-on-cloud-storage <file>   Check if a file is on cloud storage
   get-hydration-status <file>  Get the hydration status of a file
   get-pin-status <file>        Get the pin status of a file
   hydrate <file>               Hydrate a file
