@@ -24,10 +24,15 @@ public static class CloudStorageDetector
 
         try
         {
-            var file = await StorageFile.GetFileFromPathAsync(filePath);
+            if (verbose) Console.WriteLine($"Checking if {filePath} is a cloud file");
+            // Normalize the path to Windows format (replace forward slashes with backslashes)
+            // (this will prevent issues with running from, e.g. Git Bash). If we don't do
+            // this then the StorageFile.GetFileFromPathAsync call will throw an exception.
+            var normalisedPath = Path.GetFullPath(filePath).Replace('/', '\\');
+            if (verbose) Console.WriteLine($"Normalized path: {normalisedPath}");
+            var file = await StorageFile.GetFileFromPathAsync(normalisedPath);
 
             // Check if it's a cloud file.
-            if (verbose) Console.WriteLine($"Checking if {filePath} is a cloud file");
             var propertiesToRetrieve = new List<string> { "System.FilePlaceholderStatus" };
             IDictionary<string, object> props = await file
                 .Properties
@@ -49,9 +54,10 @@ public static class CloudStorageDetector
                 return (true, provider);
             }
         }
-        catch (Exception)
+        catch (Exception e)
         {
             // Fall back to attribute-based detection if the Windows Storage API fails.
+            if (verbose) Console.WriteLine($"Error: {e.Message}");
             return (IsCloudFileByAttributes(filePath), DetectProviderByPath(filePath, verbose));
         }
 
