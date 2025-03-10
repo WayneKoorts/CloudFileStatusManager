@@ -5,6 +5,23 @@ namespace CloudFileStatusManager
     public interface ICloudFileStatusManager
     {
         /// <summary>
+        /// Tries to determine if the file is in a directory registered within a
+        /// cloud provider.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="verbose"></param>
+        bool IsOnCloudStorage(string filePath, bool verbose = false);
+
+        /// <summary>
+        /// Tries to determine if the file is in a directory registered within a
+        /// cloud provider (async overload).
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="verbose"></param>
+        /// <returns></returns>
+        Task<bool> IsOnCloudStorageAsync(string filePath, bool verbose = false);
+
+        /// <summary>
         /// <para>
         /// Returns the hydration status of the file. Note that a "hydrated" file
         /// may or may not reside within a cloud folder.

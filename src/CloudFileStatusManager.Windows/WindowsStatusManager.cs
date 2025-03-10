@@ -4,6 +4,18 @@ namespace CloudFileStatusManager.Windows;
 
 public class WindowsCloudFileStatusManager : ICloudFileStatusManager
 {
+    public bool IsOnCloudStorage(string filePath, bool verbose = false)
+    {
+        return IsOnCloudStorageAsync(filePath, verbose).Result;
+    }
+
+    public async Task<bool> IsOnCloudStorageAsync(string filePath, bool verbose = false)
+    {
+        var result = await CloudStorageDetector.DetectCloudStorageAsync(filePath, verbose);
+        if (verbose) Console.WriteLine($"IsOnCloudStorageAsync result: {result.IsCloudFile}");
+        return result.IsCloudFile;
+    }
+
     public FileHydrationStatus GetHydrationStatus(string filePath, bool verbose = false)
     {
         if (verbose) Console.WriteLine($"Getting hydration status for {filePath}");

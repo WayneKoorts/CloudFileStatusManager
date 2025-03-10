@@ -8,13 +8,27 @@ ICloudFileStatusManager cloudFileStatusManager = new WindowsCloudFileStatusManag
 var rootCommand = new RootCommand("Cloud File Status Manager CLI for Windows");
 
 var fileArgument = new Argument<string>("file", "The path of the file to manage");
-var verboseOption = new Option<bool>("--verbose", "Show verbose output");
+var verboseOption = new Option<bool>(["--verbose", "-v"], "Show verbose output");
 rootCommand.AddOption(verboseOption);
+
+// is-on-cloud-storage command
+var isOnCloudStorageCommand = new Command("is-on-cloud-storage", "Check if a file is on cloud storage")
+{
+    fileArgument,
+    verboseOption
+};
+isOnCloudStorageCommand.SetHandler((filePath, verbose) =>
+{
+    var isOnCloudStorage = cloudFileStatusManager.IsOnCloudStorage(filePath, verbose);
+    Console.Write($"File is likely{(!isOnCloudStorage ? " not" : "")} on cloud storage.");
+}, fileArgument, verboseOption);
+rootCommand.AddCommand(isOnCloudStorageCommand);
 
 // get-hydration-status command
 var getHydrationStatusCommand = new Command("get-hydration-status", "Get the hydration status of a file")
 {
-    fileArgument
+    fileArgument,
+    verboseOption
 };
 getHydrationStatusCommand.SetHandler((filePath, verbose) =>
 {
@@ -27,20 +41,21 @@ rootCommand.AddCommand(getHydrationStatusCommand);
 // get-pin-status command
 var getPinStatusCommand = new Command("get-pin-status", "Get the pin status of a file")
 {
-    fileArgument
+    fileArgument,
+    verboseOption
 };
 getPinStatusCommand.SetHandler((filePath, verbose) =>
 {
     var status = cloudFileStatusManager.GetPinStatus(filePath, verbose);
     Console.WriteLine(status);
 }, fileArgument, verboseOption);
-
 rootCommand.AddCommand(getPinStatusCommand);
 
 // hydrate command
 var hydrateCommand = new Command("hydrate", "Hydrate a file")
 {
-    fileArgument
+    fileArgument,
+    verboseOption
 };
 hydrateCommand.SetHandler((filePath, verbose) =>
 {
@@ -56,13 +71,13 @@ hydrateCommand.SetHandler((filePath, verbose) =>
         Console.WriteLine("File hydrated");
     }
 }, fileArgument, verboseOption);
-
 rootCommand.AddCommand(hydrateCommand);
 
 // dehydrate command
 var dehydrateCommand = new Command("dehydrate", "Dehydrate a file")
 {
-    fileArgument
+    fileArgument,
+    verboseOption
 };
 dehydrateCommand.SetHandler((filePath, verbose) =>
 {
@@ -77,7 +92,6 @@ dehydrateCommand.SetHandler((filePath, verbose) =>
         Console.WriteLine("File dehydrated");
     }
 }, fileArgument, verboseOption);
-
 rootCommand.AddCommand(dehydrateCommand);
 
 await rootCommand.InvokeAsync(args);
