@@ -4,6 +4,13 @@
 
 This is a .NET library and CLI utility for reading & managing the hydration and pin status of files on cloud drives like iCloud Drive or OneDrive.
 
+### Packages
+
+- [CloudFileStatusManager](https://www.nuget.org/packages/com.wkoorts.CloudFileStatusManager)
+  - Contains the `ICloudFileStatusManager` interface, and enums for the hydration and pin status of files. This is a cross-platform package and required in all cases.
+- [CloudFileStatusManager.Windows](https://www.nuget.org/packages/com.wkoorts.CloudFileStatusManager.Windows)
+  - Contains the Windows implementation of the `ICloudFileStatusManager` interface.  You also need this one in all cases at the moment because Windows is the only supported platform, but there will be a macOS version in the future.
+
 ## Features
 
 - Read the hydration status (whether or not the file has been downloaded locally) of files on cloud drives.
