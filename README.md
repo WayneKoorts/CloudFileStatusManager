@@ -61,3 +61,7 @@ Commands:
 ## Acknowledgements
 
 Thank you to [Hunter Ratliff](https://hratliff.com/), who explained how file attributes in Windows represent the various states of files on cloud drives in [this blog post](https://hratliff.com/posts/icloud-onedrive-syncing-in-cmd/).
+
+## Donate
+
+<a href="https://www.buymeacoffee.com/waynekoorts" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="26" width="113"></a>
