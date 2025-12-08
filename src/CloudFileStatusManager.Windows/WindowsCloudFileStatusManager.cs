@@ -25,26 +25,101 @@ public class WindowsCloudFileStatusManager : ICloudFileStatusManager
             throw new FileNotFoundException("File not found", filePath);
         }
 
-        var attributes = ExternalFileUtils.GetAttributesViaHandleEx(filePath);
-
-        if (verbose)
+        // Try Cloud Filter API first (most authoritative)
+        var placeholderState = ExternalFileUtils.GetPlaceholderState(filePath);
+        if (placeholderState != null)
         {
-            Console.WriteLine("Attributes:");
-            Console.WriteLine($"  Pinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0}");
-            Console.WriteLine($"  Unpinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0}");
-            Console.WriteLine($"  Offline? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_OFFLINE) != 0}");
-            Console.WriteLine($"  Recall on data access? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0}");
-            Console.WriteLine($"  Recall on open? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0}");
-            Console.WriteLine($"  Sparse file? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_SPARSE_FILE) != 0}");
-            Console.WriteLine($"  Reparse point? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_REPARSE_POINT) != 0}");
+            if (verbose)
+            {
+                Console.WriteLine($"Cloud Filter API placeholder state: {placeholderState.Value}");
+            }
+
+            var (attributes, _) = ExternalFileUtils.GetAttributesAndReparseTag(filePath);
+            if (verbose) PrintAttributeInfo(attributes, placeholderState.Value);
+
+            return DetermineHydrationStatusFromPlaceholderState(placeholderState.Value, attributes);
         }
 
-        return DetermineHydrationStatusFromAttributes(attributes);
+        // Fallback to attribute-based detection
+        if (verbose) Console.WriteLine("Cloud Filter API not available, using attribute-based detection");
+
+        var fileAttributes = ExternalFileUtils.GetAttributesViaHandleEx(filePath);
+        if (verbose) PrintAttributeInfo(fileAttributes, null);
+
+        return DetermineHydrationStatusFromAttributes(fileAttributes);
+    }
+
+    private static void PrintAttributeInfo(uint attributes, ExternalFileUtils.CF_PLACEHOLDER_STATE? placeholderState)
+    {
+        Console.WriteLine("Attributes:");
+        Console.WriteLine($"  Pinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0}");
+        Console.WriteLine($"  Unpinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0}");
+        Console.WriteLine($"  Offline? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_OFFLINE) != 0}");
+        Console.WriteLine($"  Recall on data access? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0}");
+        Console.WriteLine($"  Recall on open? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0}");
+        Console.WriteLine($"  Sparse file? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_SPARSE_FILE) != 0}");
+        Console.WriteLine($"  Reparse point? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_REPARSE_POINT) != 0}");
+
+        if (placeholderState != null)
+        {
+            var state = placeholderState.Value;
+            Console.WriteLine("Placeholder State Flags:");
+            Console.WriteLine($"  Is placeholder? {state.HasFlag(ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER)}");
+            Console.WriteLine($"  In sync? {state.HasFlag(ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_IN_SYNC)}");
+            Console.WriteLine($"  Partial? {state.HasFlag(ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIAL)}");
+            Console.WriteLine($"  Partially on disk? {state.HasFlag(ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIALLY_ON_DISK)}");
+        }
     }
 
     /// <summary>
-    /// Determines the hydration status based on file attributes.
-    /// This method is internal to allow unit testing of the attribute logic.
+    /// Determines the hydration status using Cloud Filter API placeholder state.
+    /// This provides more authoritative detection than attribute-based detection.
+    /// </summary>
+    /// <param name="placeholderState">The placeholder state from Cloud Filter API.</param>
+    /// <param name="attributes">The file attributes (used for PINNED check).</param>
+    /// <returns>The determined hydration status.</returns>
+    internal static FileHydrationStatus DetermineHydrationStatusFromPlaceholderState(
+        ExternalFileUtils.CF_PLACEHOLDER_STATE placeholderState, uint attributes)
+    {
+        bool isPlaceholder = placeholderState.HasFlag(
+            ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PLACEHOLDER);
+
+        if (!isPlaceholder)
+        {
+            // Not a cloud placeholder - regular file or fully converted
+            return FileHydrationStatus.Hydrated;
+        }
+
+        // Check for partial hydration (file is being downloaded)
+        bool isPartial = placeholderState.HasFlag(
+            ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIAL);
+        bool isPartiallyOnDisk = placeholderState.HasFlag(
+            ExternalFileUtils.CF_PLACEHOLDER_STATE.CF_PLACEHOLDER_STATE_PARTIALLY_ON_DISK);
+
+        if (isPartial || isPartiallyOnDisk)
+        {
+            // File is partially hydrated - actively being downloaded
+            return FileHydrationStatus.Hydrating;
+        }
+
+        // Check recall attributes to determine if dehydrated or hydrated
+        bool needsRecall = (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0
+                           || (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0;
+
+        if (needsRecall)
+        {
+            // Placeholder needs data recall - check if pinned (actively downloading)
+            bool isPinned = (attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0;
+            return isPinned ? FileHydrationStatus.Hydrating : FileHydrationStatus.Dehydrated;
+        }
+
+        // Placeholder with no recall needed - fully hydrated
+        return FileHydrationStatus.Hydrated;
+    }
+
+    /// <summary>
+    /// Determines the hydration status based on file attributes only.
+    /// This is a fallback method when Cloud Filter API is not available.
     /// </summary>
     /// <param name="attributes">The file attributes from Windows API.</param>
     /// <returns>The determined hydration status.</returns>
