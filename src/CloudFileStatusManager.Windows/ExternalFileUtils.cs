@@ -7,10 +7,14 @@ namespace CloudFileStatusManager.Windows;
 public static class ExternalFileUtils
 {
     // Windows API constants for cloud file attributes.
-    internal const int FILE_ATTRIBUTE_PINNED = 0x00080000;
-    internal const int FILE_ATTRIBUTE_UNPINNED = 0x00100000;
-    internal const int FILE_ATTRIBUTE_OFFLINE = 0x00001000;
-    internal const int FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS = 0x00400000;
+    // See: https://learn.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants
+    internal const uint FILE_ATTRIBUTE_SPARSE_FILE = 0x00000200;
+    internal const uint FILE_ATTRIBUTE_REPARSE_POINT = 0x00000400;
+    internal const uint FILE_ATTRIBUTE_OFFLINE = 0x00001000;
+    internal const uint FILE_ATTRIBUTE_RECALL_ON_OPEN = 0x00040000;
+    internal const uint FILE_ATTRIBUTE_PINNED = 0x00080000;
+    internal const uint FILE_ATTRIBUTE_UNPINNED = 0x00100000;
+    internal const uint FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS = 0x00400000;
     private const int FILE_READ_ATTRIBUTES = 0x0080;
     private const int FILE_WRITE_ATTRIBUTES = 0x0100;
     private const int FILE_SHARE_READ = 0x00000001;

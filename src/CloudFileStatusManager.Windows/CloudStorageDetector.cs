@@ -65,13 +65,22 @@ public static class CloudStorageDetector
     }
 
     // Fallback method using file attributes.
+    // Cloud placeholder files typically have specific attribute combinations.
     private static bool IsCloudFileByAttributes(string filePath)
     {
         var attributes = ExternalFileUtils.GetAttributesViaHandleEx(filePath);
-        
-        return (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0 ||
-               (attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0 ||
-               (attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0;
+
+        // Primary indicators: recall attributes indicate cloud placeholder files.
+        bool hasRecallAttribute = (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0
+                                  || (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0;
+
+        // Cloud-specific pin attributes (these are specific to Windows Cloud Files API).
+        bool hasCloudPinAttribute = (attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0
+                                    || (attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0;
+
+        // A file with recall attributes is definitely a cloud placeholder.
+        // A file with cloud pin attributes is likely a cloud file (hydrated or not).
+        return hasRecallAttribute || hasCloudPinAttribute;
     }
 
     // Fallback method using path analysis.

@@ -30,56 +30,43 @@ public class WindowsCloudFileStatusManager : ICloudFileStatusManager
         if (verbose)
         {
             Console.WriteLine("Attributes:");
-            Console.WriteLine($"  Pinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0}");
+            Console.WriteLine($"  Pinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0}");
             Console.WriteLine($"  Unpinned? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0}");
             Console.WriteLine($"  Offline? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_OFFLINE) != 0}");
             Console.WriteLine($"  Recall on data access? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0}");
-        }
-        
-        // If the attributes contain recall on data access and unpinned, the file is dehydrated.
-        if ((attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) != 0)
-        {
-            return FileHydrationStatus.Dehydrated;
-        }
-        // Check conditions for hydrated state.
-        // Hydrated is either:
-        // 1. Pinned and not recall on data access and not unpinned, or
-        // 2. Not recall on data access and not unpinned and not pinned.
-        if (
-            // Pinned
-            ((attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0 
-            // and not Recall on data access
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) == 0
-            // and not Offline
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_OFFLINE) == 0
-            // and not Unpinned
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) == 0 )
-            //--
-            // Or
-            //--
-            ||
-            // Not Recall on data access
-            (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) == 0
-            // and not Unpinned
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_UNPINNED) == 0
-            // and not Offline
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_OFFLINE) == 0
-            // and not Pinned
-            && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) == 0)
-        {
-            return FileHydrationStatus.Hydrated;
-        }
-        // Else if the attributes contain recall on data access and pinned, or just recall
-        // on data access, the file is hydrating.
-        if ((attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0
-              && (attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0
-            || (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0)
-        {
-            return FileHydrationStatus.Hydrating;
+            Console.WriteLine($"  Recall on open? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0}");
+            Console.WriteLine($"  Sparse file? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_SPARSE_FILE) != 0}");
+            Console.WriteLine($"  Reparse point? {(attributes & ExternalFileUtils.FILE_ATTRIBUTE_REPARSE_POINT) != 0}");
         }
 
-        // Default to hydrated if none of the above conditions are met.
+        return DetermineHydrationStatusFromAttributes(attributes);
+    }
+
+    /// <summary>
+    /// Determines the hydration status based on file attributes.
+    /// This method is internal to allow unit testing of the attribute logic.
+    /// </summary>
+    /// <param name="attributes">The file attributes from Windows API.</param>
+    /// <returns>The determined hydration status.</returns>
+    internal static FileHydrationStatus DetermineHydrationStatusFromAttributes(uint attributes)
+    {
+        // Check if file needs to recall data (i.e., content is not locally available).
+        // RECALL_ON_DATA_ACCESS: Data will be fetched when file content is read.
+        // RECALL_ON_OPEN: Data will be fetched when file is opened.
+        bool needsRecall = (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS) != 0
+                           || (attributes & ExternalFileUtils.FILE_ATTRIBUTE_RECALL_ON_OPEN) != 0;
+
+        bool isPinned = (attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0;
+
+        if (needsRecall)
+        {
+            // File content is not locally available.
+            // If PINNED is set, the cloud provider is actively downloading the file.
+            // Otherwise, it's a dehydrated placeholder waiting to be accessed.
+            return isPinned ? FileHydrationStatus.Hydrating : FileHydrationStatus.Dehydrated;
+        }
+
+        // File content is locally available (no recall needed).
         return FileHydrationStatus.Hydrated;
     }
 
@@ -92,7 +79,17 @@ public class WindowsCloudFileStatusManager : ICloudFileStatusManager
         }
 
         var attributes = ExternalFileUtils.GetAttributesViaHandleEx(filePath);
+        return DeterminePinStatusFromAttributes(attributes);
+    }
 
+    /// <summary>
+    /// Determines the pin status based on file attributes.
+    /// This method is internal to allow unit testing of the attribute logic.
+    /// </summary>
+    /// <param name="attributes">The file attributes from Windows API.</param>
+    /// <returns>The determined pin status.</returns>
+    internal static FilePinStatus DeterminePinStatusFromAttributes(uint attributes)
+    {
         if ((attributes & ExternalFileUtils.FILE_ATTRIBUTE_PINNED) != 0)
         {
             return FilePinStatus.Pinned;
