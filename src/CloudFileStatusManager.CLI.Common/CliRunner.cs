@@ -4,8 +4,18 @@ using CloudFileStatusManager.Enums;
 
 namespace CloudFileStatusManager.CLI.Common;
 
+/// <summary>
+/// Provides common CLI command implementation for Cloud File Status Manager.
+/// </summary>
 public static class CliRunner
 {
+    /// <summary>
+    /// Runs the CLI with the specified cloud file status manager implementation.
+    /// </summary>
+    /// <param name="cloudFileStatusManager">The platform-specific implementation of ICloudFileStatusManager.</param>
+    /// <param name="platformDescription">The platform name for display purposes (e.g., "Windows", "macOS").</param>
+    /// <param name="args">Command line arguments.</param>
+    /// <returns>The exit code (0 for success, non-zero for failure).</returns>
     public static async Task<int> RunAsync(
         ICloudFileStatusManager cloudFileStatusManager,
         string platformDescription,

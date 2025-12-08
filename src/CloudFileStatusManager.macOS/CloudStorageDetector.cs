@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace CloudFileStatusManager.macOS;
 
@@ -6,12 +6,13 @@ namespace CloudFileStatusManager.macOS;
 public enum CloudStorageProvider
 {
     None,
+    OneDrive,
     ICloud,
     Unknown
 }
 
 /// <summary>
-/// Detects whether a file is on cloud storage (iCloud Drive) on macOS.
+/// Detects whether a file is on cloud storage (iCloud Drive or OneDrive) on macOS.
 /// </summary>
 public static class CloudStorageDetector
 {
@@ -108,6 +109,14 @@ public static class CloudStorageDetector
     private static CloudStorageProvider DetectProviderByPath(string filePath, bool verbose)
     {
         var path = Path.GetFullPath(filePath).ToLowerInvariant();
+
+        // OneDrive paths on macOS
+        // Typically: ~/OneDrive or ~/Library/CloudStorage/OneDrive-*
+        if (path.Contains("onedrive") || path.Contains("sharepoint"))
+        {
+            if (verbose) Console.WriteLine("Detected OneDrive by path");
+            return CloudStorageProvider.OneDrive;
+        }
 
         // iCloud Drive paths on macOS
         // Typically: ~/Library/Mobile Documents/com~apple~CloudDocs/

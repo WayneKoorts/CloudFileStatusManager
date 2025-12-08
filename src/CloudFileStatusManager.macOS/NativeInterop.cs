@@ -1,6 +1,5 @@
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-
-// ReSharper disable InconsistentNaming
 
 namespace CloudFileStatusManager.macOS;
 
@@ -8,6 +7,7 @@ namespace CloudFileStatusManager.macOS;
 /// Native Objective-C runtime and Foundation framework interop for macOS.
 /// Used to access NSFileManager and NSURL APIs for iCloud file status detection.
 /// </summary>
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static class NativeInterop
 {
     private const string FoundationLib = "/System/Library/Frameworks/Foundation.framework/Foundation";
@@ -160,8 +160,24 @@ internal static class NativeInterop
     #region Helper Methods
 
     /// <summary>
+    /// Releases an Objective-C object by sending it a release message.
+    /// </summary>
+    /// <param name="obj">The Objective-C object to release.</param>
+    internal static void ReleaseNSObject(IntPtr obj)
+    {
+        if (obj == IntPtr.Zero) return;
+        var releaseSel = sel_registerName("release");
+        objc_msgSend(obj, releaseSel);
+    }
+
+    /// <summary>
     /// Creates an NSString from a C# string.
     /// </summary>
+    /// <param name="str">The C# string to convert.</param>
+    /// <returns>A retained NSString that the caller is responsible for releasing.</returns>
+    /// <remarks>
+    /// The caller must call <see cref="ReleaseNSObject"/> on the returned pointer when done.
+    /// </remarks>
     internal static IntPtr CreateNSString(string str)
     {
         var nsStringClass = objc_getClass("NSString");
@@ -183,12 +199,25 @@ internal static class NativeInterop
     /// <summary>
     /// Creates an NSURL from a file path string.
     /// </summary>
+    /// <param name="filePath">The file path to convert.</param>
+    /// <returns>An autoreleased NSURL object.</returns>
+    /// <remarks>
+    /// The returned NSURL is autoreleased and does not need to be explicitly released.
+    /// </remarks>
     internal static IntPtr CreateNSURLFromPath(string filePath)
     {
         var nsUrlClass = objc_getClass("NSURL");
         var fileURLWithPathSel = sel_registerName("fileURLWithPath:");
         var nsPath = CreateNSString(filePath);
-        return objc_msgSend(nsUrlClass, fileURLWithPathSel, nsPath);
+        try
+        {
+            return objc_msgSend(nsUrlClass, fileURLWithPathSel, nsPath);
+        }
+        finally
+        {
+            // Release the intermediate NSString to prevent memory leak
+            ReleaseNSObject(nsPath);
+        }
     }
 
     /// <summary>

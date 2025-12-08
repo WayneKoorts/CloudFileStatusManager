@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using CloudFileStatusManager.Enums;
 
 namespace CloudFileStatusManager.macOS;
@@ -228,8 +228,6 @@ public class MacOSCloudFileStatusManager : ICloudFileStatusManager
         if (verbose) Console.WriteLine("File evicted from local storage");
     }
 
-    #region Private Helper Methods
-
     private static IntPtr GetUrlResourceValue(IntPtr nsUrl, IntPtr key)
     {
         if (nsUrl == IntPtr.Zero || key == IntPtr.Zero) return IntPtr.Zero;
@@ -279,6 +277,4 @@ public class MacOSCloudFileStatusManager : ICloudFileStatusManager
         Console.WriteLine($"  Downloaded: {downloaded ?? "(null)"}");
         Console.WriteLine($"  Current: {current ?? "(null)"}");
     }
-
-    #endregion
 }
