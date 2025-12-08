@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0-macos;net9.0-macos</TargetFrameworks>
-    <SupportedOSPlatformVersion>12.0</SupportedOSPlatformVersion>
+    <TargetFrameworks>net8.0;net8.0-macos;net9.0-macos</TargetFrameworks>
+    <SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-macos'))">12.0</SupportedOSPlatformVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
