@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-macos</TargetFramework>
+    <SupportedOSPlatformVersion>12.0</SupportedOSPlatformVersion>
+    <ApplicationId>com.wkoorts.cfsm</ApplicationId>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>$(AssemblyName)</PackageId>
+    <AssemblyName>cfsm</AssemblyName>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PublishAot>False</PublishAot>
+    <Version>$(AssemblyVersion)</Version>
+    <Copyright>Copyright (c) Wayne Koorts 2025</Copyright>
+    <Authors>Wayne Koorts</Authors>
+    <PackageProjectUrl>https://github.com/WayneKoorts/CloudFileStatusManager</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/WayneKoorts/CloudFileStatusManager</RepositoryUrl>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CloudFileStatusManager.CLI.Common\CloudFileStatusManager.CLI.Common.csproj" />
+    <ProjectReference Include="..\CloudFileStatusManager.macOS\CloudFileStatusManager.macOS.csproj" />
+    <ProjectReference Include="..\CloudFileStatusManager\CloudFileStatusManager.csproj" />
+  </ItemGroup>
+
+</Project>

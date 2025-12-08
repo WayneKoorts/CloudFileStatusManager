@@ -90,19 +90,44 @@ public class MacOSCloudFileStatusManager : ICloudFileStatusManager
             throw new FileNotFoundException("File not found", filePath);
         }
 
-        // macOS doesn't have the same pinned/unpinned concept as Windows.
-        // Files in iCloud Drive are either:
-        // - Downloaded (available locally) - closest to "pinned"
-        // - Not downloaded (cloud only) - closest to "unpinned"
-        // We'll infer pin status from hydration status.
+        // macOS uses the extended attribute "com.apple.fileprovider.pinned#PX" to indicate
+        // whether a file is pinned (Keep Downloaded). A value of "1" means pinned.
+        const string pinnedAttribute = "com.apple.fileprovider.pinned#PX";
 
-        var hydrationStatus = GetHydrationStatus(filePath, verbose);
+        var isPinned = HasExtendedAttributeWithValue(filePath, pinnedAttribute, "1", verbose);
 
-        // If the file is hydrated (downloaded), consider it "pinned" (kept locally)
-        // If dehydrated, consider it "unpinned" (allowed to be evicted)
-        return hydrationStatus == FileHydrationStatus.Hydrated
-            ? FilePinStatus.Pinned
-            : FilePinStatus.Unpinned;
+        if (verbose)
+        {
+            Console.WriteLine($"File is pinned (Keep Downloaded): {isPinned}");
+        }
+
+        return isPinned ? FilePinStatus.Pinned : FilePinStatus.Unpinned;
+    }
+
+    private static bool HasExtendedAttributeWithValue(string filePath, string attributeName, string expectedValue, bool verbose)
+    {
+        // Use getxattr to read the extended attribute
+        var buffer = new byte[256];
+        var size = NativeInterop.getxattr(filePath, attributeName, buffer, buffer.Length, 0, 0);
+
+        if (verbose)
+        {
+            Console.WriteLine($"getxattr for '{attributeName}' returned size: {size}");
+        }
+
+        if (size <= 0)
+        {
+            return false;
+        }
+
+        var value = System.Text.Encoding.UTF8.GetString(buffer, 0, (int)size).TrimEnd('\0');
+
+        if (verbose)
+        {
+            Console.WriteLine($"Extended attribute value: '{value}'");
+        }
+
+        return value == expectedValue;
     }
 
     public void HydrateFile(string filePath, bool verbose = false)
@@ -167,6 +192,18 @@ public class MacOSCloudFileStatusManager : ICloudFileStatusManager
         {
             Console.WriteLine("File is already dehydrated.");
             return;
+        }
+
+        // Remove the pinned attribute first to prevent automatic re-download
+        // This matches Windows behavior where dehydrate also unpins the file
+        const string pinnedAttribute = "com.apple.fileprovider.pinned#PX";
+        var removeResult = NativeInterop.removexattr(filePath, pinnedAttribute, 0);
+        if (verbose)
+        {
+            if (removeResult == 0)
+                Console.WriteLine("Removed pinned attribute (Keep Downloaded disabled)");
+            else
+                Console.WriteLine("No pinned attribute to remove (file was not pinned)");
         }
 
         // Use NSFileManager to evict the ubiquitous item

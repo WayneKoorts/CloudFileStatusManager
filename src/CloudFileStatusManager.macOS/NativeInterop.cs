@@ -42,6 +42,36 @@ internal static class NativeInterop
     [DllImport(ObjCLib, EntryPoint = "objc_msgSend")]
     internal static extern bool objc_msgSend_bool(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
+    [DllImport(ObjCLib, EntryPoint = "objc_msgSend")]
+    internal static extern bool objc_msgSend_bool(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2, IntPtr arg3);
+
+    #endregion
+
+    #region Extended Attributes
+
+    private const string LibSystem = "libSystem.dylib";
+
+    /// <summary>
+    /// Gets an extended attribute value from a file.
+    /// </summary>
+    [DllImport(LibSystem, SetLastError = true)]
+    internal static extern long getxattr(
+        [MarshalAs(UnmanagedType.LPStr)] string path,
+        [MarshalAs(UnmanagedType.LPStr)] string name,
+        byte[] value,
+        long size,
+        uint position,
+        int options);
+
+    /// <summary>
+    /// Removes an extended attribute from a file.
+    /// </summary>
+    [DllImport(LibSystem, SetLastError = true)]
+    internal static extern int removexattr(
+        [MarshalAs(UnmanagedType.LPStr)] string path,
+        [MarshalAs(UnmanagedType.LPStr)] string name,
+        int options);
+
     #endregion
 
     #region Foundation Framework Constants
@@ -54,6 +84,7 @@ internal static class NativeInterop
     private static IntPtr _NSURLUbiquitousItemDownloadingStatusCurrent;
     private static IntPtr _NSURLUbiquitousItemIsDownloadingKey;
     private static IntPtr _NSURLIsUbiquitousItemKey;
+    private static IntPtr _NSURLUbiquitousItemDownloadRequestedKey;
 
     [DllImport("libdl.dylib")]
     private static extern IntPtr dlopen(string path, int mode);
@@ -79,6 +110,7 @@ internal static class NativeInterop
         _NSURLUbiquitousItemDownloadingStatusCurrent = GetSymbolPointer("NSURLUbiquitousItemDownloadingStatusCurrent");
         _NSURLUbiquitousItemIsDownloadingKey = GetSymbolPointer("NSURLUbiquitousItemIsDownloadingKey");
         _NSURLIsUbiquitousItemKey = GetSymbolPointer("NSURLIsUbiquitousItemKey");
+        _NSURLUbiquitousItemDownloadRequestedKey = GetSymbolPointer("NSURLUbiquitousItemDownloadRequestedKey");
     }
 
     private static IntPtr GetSymbolPointer(string symbolName)
@@ -116,6 +148,11 @@ internal static class NativeInterop
     internal static IntPtr NSURLIsUbiquitousItemKey
     {
         get { EnsureFoundationLoaded(); return _NSURLIsUbiquitousItemKey; }
+    }
+
+    internal static IntPtr NSURLUbiquitousItemDownloadRequestedKey
+    {
+        get { EnsureFoundationLoaded(); return _NSURLUbiquitousItemDownloadRequestedKey; }
     }
 
     #endregion
