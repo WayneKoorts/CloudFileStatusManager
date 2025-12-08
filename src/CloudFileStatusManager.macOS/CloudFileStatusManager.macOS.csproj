@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-macos;net9.0-macos</TargetFrameworks>
+    <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+    <InternalsVisibleTo>CloudFileStatusManager.macOS.Tests</InternalsVisibleTo>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>com.wkoorts.$(AssemblyName)</PackageId>
+    <Title>Cloud File Status Manager for macOS</Title>
+    <Authors>Wayne Koorts</Authors>
+    <Description>A C# library for managing the hydration status of files on cloud drives like iCloud Drive. This package contains the macOS implementation of ICloudFileStatusManager.</Description>
+    <Copyright>Copyright (c) Wayne Koorts 2025</Copyright>
+    <PackageProjectUrl>https://github.com/WayneKoorts/CloudFileStatusManager</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/WayneKoorts/CloudFileStatusManager</RepositoryUrl>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>$(AssemblyVersion)</Version>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CloudFileStatusManager\CloudFileStatusManager.csproj" />
+  </ItemGroup>
+
+</Project>
