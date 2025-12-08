@@ -9,7 +9,9 @@ This is a .NET library and CLI utility for reading & managing the hydration and 
 - [CloudFileStatusManager](https://www.nuget.org/packages/com.wkoorts.CloudFileStatusManager)
   - Contains the `ICloudFileStatusManager` interface, and enums for the hydration and pin status of files. This is a cross-platform package and required in all cases.
 - [CloudFileStatusManager.Windows](https://www.nuget.org/packages/com.wkoorts.CloudFileStatusManager.Windows)
-  - Contains the Windows implementation of the `ICloudFileStatusManager` interface.  You also need this one in all cases at the moment because Windows is the only supported platform, but there will be a macOS version in the future.
+  - Contains the Windows implementation of the `ICloudFileStatusManager` interface.
+- [CloudFileStatusManager.macOS](https://www.nuget.org/packages/com.wkoorts.CloudFileStatusManager.macOS)
+  - Contains the macOS implementation of the `ICloudFileStatusManager` interface.
 
 ## Features
 
@@ -18,8 +20,9 @@ This is a .NET library and CLI utility for reading & managing the hydration and 
 
 ## Limitations
 
-- Tested only with iCloud Drive and OneDrive, but may work for other providers.  I suspect that any cloud drive which is implemented with the Windows [Cloud Filter API](https://learn.microsoft.com/en-us/windows/win32/cfapi/cloud-filter-reference) will probably work.
-- Initially only supports Windows, but I need a Mac implementation for a project I'm working on, so I'll probably add that soon if it makes sense under the same interfaces.
+- Tested only with iCloud Drive and OneDrive, but may work for other providers.
+  - On Windows, any cloud drive implemented with the [Cloud Filter API](https://learn.microsoft.com/en-us/windows/win32/cfapi/cloud-filter-reference) should work.
+  - On macOS, the implementation uses NSURL ubiquitous item APIs which are designed for iCloud, but path-based detection is also available for OneDrive.
 
 ## Project & Package Structure
 
@@ -29,18 +32,49 @@ This is a .NET library and CLI utility for reading & managing the hydration and 
 - CloudFileStatusManager.Windows project
   - Produces the CloudFileStatusManager.Windows package (`com.wkoorts.CloudFileStatusManager.Windows`).
   - Contains the Windows implementation of the `ICloudFileStatusManager` interface.
+- CloudFileStatusManager.macOS project
+  - Produces the CloudFileStatusManager.macOS package (`com.wkoorts.CloudFileStatusManager.macOS`).
+  - Contains the macOS implementation of the `ICloudFileStatusManager` interface.
+- CloudFileStatusManager.CLI.Common project
+  - Contains shared CLI command logic used by both platform-specific CLI applications.
 - CloudFileStatusManager.CLI.Windows project
-  - This is a command-line interface for `CloudFileStatusManager.Windows`.
-  - Produces no package.
+  - Command-line interface for Windows.
+- CloudFileStatusManager.CLI.macOS project
+  - Command-line interface for macOS.
 
 ## Using the CLI
 
 Binaries for the CLI are available to download from the [Releases page](https://github.com/WayneKoorts/CloudFileStatusManager/releases).
 
+### Windows
+
 ```shell
 $ ./cfsm.exe --help
 Description:
   Cloud File Status Manager CLI for Windows
+
+Usage:
+  cfsm [command] [options]
+
+Options:
+  -v, --verbose   Show verbose output
+  --version       Show version information
+  -?, -h, --help  Show help and usage information
+
+Commands:
+  is-on-cloud-storage <file>   Check if a file is on cloud storage
+  get-hydration-status <file>  Get the hydration status of a file
+  get-pin-status <file>        Get the pin status of a file
+  hydrate <file>               Hydrate a file
+  dehydrate <file>             Dehydrate a file
+```
+
+### macOS
+
+```shell
+$ ./cfsm --help
+Description:
+  Cloud File Status Manager CLI for macOS
 
 Usage:
   cfsm [command] [options]
